@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
@@ -27,6 +28,8 @@ public class Main : MonoBehaviour
     void Start()
     {
         scope = CanvasController.Instance().GetScope();
+
+        utils.Setup();
 
         GameController = scope["GameView"].GetComponent<GameController>();
         GameController.gameObject.SetActive(false);

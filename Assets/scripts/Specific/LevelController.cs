@@ -1,31 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LevelController : MonoBehaviour
 {
-    //public Dictionary<int, Level> Levels = new Dictionary<int, Level>
-    //{
-    //    new KeyValuePair<int, Level>()
-
-    //    new Level
-    //    {
-    //        Id = 1,
-    //        Word = "ace"
-    //    },
-    //    new Level
-    //    {
-    //        Id = 2,
-    //        Word = "Pasare"
-    //    },
-    //    new Level
-    //    {
-    //        Id = 3,
-    //        Word = "desoxirribonucleic"
-    //    }
-    //};
-
     public Dictionary<int, Level> Levels = new Dictionary<int, Level>();
 
     public List<CButton> LevelButtons;
@@ -75,12 +55,30 @@ public class LevelController : MonoBehaviour
 
         gameObject.SetActive(true);
 
+        StartCoroutine(ShowLevels());
+    }
+
+    IEnumerator ShowLevels()
+    {
+        yield return new WaitForSeconds(0.01f);
+
         var rt = Main.Instance().scope["LevelGrid"].GetComponent<RectTransform>();
         var gridLayoutGroup = Main.Instance().scope["LevelGrid"].GetComponent<GridLayoutGroup>();
 
         var width = rt.sizeDelta.x;
-        
-        gridLayoutGroup.cellSize = new Vector2(100, 100);
+        var height = rt.sizeDelta.y;
+
+        var cellSize = width / 6;
+
+        var cellSizeY = height / 3;
+
+        var paddingY = utils.GetPercent(cellSizeY, 30);
+        var paddingX = utils.GetPercent(cellSize, 20);
+        Debug.Log(paddingY);
+
+
+        gridLayoutGroup.spacing = new Vector2(paddingX / 2, paddingY / 2);
+        gridLayoutGroup.cellSize = new Vector2(cellSize - paddingX, cellSizeY - paddingY);
 
         LevelButtons = new List<CButton>();
         for (var i = 1; i <= Levels.Count; i++)
@@ -103,7 +101,7 @@ public class LevelController : MonoBehaviour
     private void OnLevelSelected(int index)
     {
         Debug.Log("Selected Level:" + index);
-        
+
         Main.Instance().GameController.Init();
         Main.Instance().GameController.StartGame(Levels[index], OnLeveCompleted);
 
