@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,6 +28,11 @@ public class GameController : MonoBehaviour
     public delegate void OnLeveCompleted(int index);
 
     private OnLeveCompleted _onLeveCompleted;
+
+    private delegate void OnClickLetterCallback();
+
+
+    //
 
     // for test we just send the level.
     public void StartGame(Level level, OnLeveCompleted onLeveCompleted)
@@ -63,7 +69,6 @@ public class GameController : MonoBehaviour
             Debug.Log(QuestionController.WordLetters[QuestionController.CurrentWordLetter - 1].Predefined);
 
         var isEndPoint = QuestionController.CalculateAvailableLetterIndex(forward: false);
-
         if (isEndPoint)
             return;
 
@@ -86,28 +91,21 @@ public class GameController : MonoBehaviour
             Debug.Log(QuestionController.CurrentWordLetter + " - " + QuestionController.LastAvailablePlace);
 
         var isEndPoint = QuestionController.CalculateAvailableLetterIndex(forward: true);
-
         if (isEndPoint)
             return;
+        
+        StartCoroutine(AnimateLetterPlacing(AnswersController.AllLetters[index], QuestionController.WordLetters[QuestionController.CurrentWordLetter], index,
+            OnClickLetterEndAnimation));
+    }
 
-        /*
-         anim - s
-         */
-
-        AnimateLetterPlacing(AnswersController.AllLetters[index], QuestionController.WordLetters[QuestionController.CurrentWordLetter], index);
-
-        /*
-         anim - end
-         */
-
-
+    private void OnClickLetterEndAnimation()
+    {
         QuestionController.CurrentWordLetter++;
         if (QuestionController.CurrentWordLetter == QuestionController.LastAvailablePlace)
         {
             Debug.Log("Check if game can end...");
 
             CheckIfWordIsCorrect();
-            return;
         }
     }
 
@@ -141,30 +139,52 @@ public class GameController : MonoBehaviour
         return reverse;
     }
 
-    private void AnimateLetterPlacing(LetterButton answerLetter, Letter questionLetterSpace, int index)
+    private RectTransform _currentAnimatedRt;
+
+    IEnumerator AnimateLetterPlacing(LetterButton answerLetter, Letter questionLetterSpace, int index,
+        OnClickLetterCallback onClickLetterEndAnimation)
     {
+        float animationTime = 0.5f;
+
         var globalParent = Main.Instance().scope["GameView"].GetComponent<RectTransform>();
-        
+
         answerLetter.Show(false);
 
         var animLetter = GetAnimationLetter(answerLetter.Text.text);
+
+        _currentAnimatedRt = animLetter.GetComponent<RectTransform>();
+        _currentAnimatedRt.position = answerLetter.Rt.position;
+        _currentAnimatedRt.sizeDelta = new Vector2(answerLetter.Rt.sizeDelta.x, answerLetter.Rt.sizeDelta.y);
+
+        // Animate moving towards the available space
         
-        var aRt = animLetter.GetComponent<RectTransform>();
-        aRt.position = answerLetter.Rt.position;
-        aRt.sizeDelta = new Vector2(answerLetter.Rt.sizeDelta.x, answerLetter.Rt.sizeDelta.y);
+        iTween.MoveTo(animLetter, iTween.Hash(
+            "position", questionLetterSpace.Rt.position,
+            "time", animationTime));
+
+        iTween.ValueTo(gameObject, iTween.Hash(
+            "from", _currentAnimatedRt.sizeDelta,
+            "to", new Vector2(
+                            utils.GetPercent(questionLetterSpace.Rt.sizeDelta.x, 95),
+                            utils.GetPercent(questionLetterSpace.Rt.sizeDelta.y, 91)),
+            "time", animationTime,
+            "onupdatetarget", gameObject,
+            "onupdate", "UpdateLetterScale"
+        ));
         
-        // Animate moving towards the available space.
+        yield return new WaitForSeconds(animationTime);
 
         // handle everything within a callback.
-
-
-
-
-        // old way
+        onClickLetterEndAnimation();
 
         // Add the letter to the current index in the word.
         //questionLetterSpace.Text.text = letter;
-        //questionLetterSpace.HiddenLetterButtonIndex = index;
+        questionLetterSpace.HiddenLetterButtonIndex = index;
+    }
+
+    public void UpdateLetterScale(Vector2 newValue)
+    {
+        _currentAnimatedRt.sizeDelta = newValue;
     }
 
     private GameObject _animationLetter;

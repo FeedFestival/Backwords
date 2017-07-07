@@ -8,11 +8,13 @@ public class Letter : MonoBehaviour
     public int Index;
     public bool Predefined;
     public Text Text;
+    public RectTransform Rt;
     public int HiddenLetterButtonIndex;
 
     public void Init(int i, string c)
     {
         Index = i;
+        Rt = GetComponent<RectTransform>();
 
         if (c == " ")
             Predefined = false;
