@@ -76,10 +76,20 @@ public class AnswersController : MonoBehaviour
         AllLetters = new Dictionary<int, LetterButton>();
         for (var i = 0; i < possibleLetters.Count; i++)
         {
+            GameObject placeholder = Instantiate(Resources.Load("Prefabs/placeholder", typeof(GameObject))) as GameObject;
+
+            if (placeholder != null)
+            {
+                placeholder.transform.SetParent(rt);
+                placeholder.transform.localScale = new Vector3(1, 1, 1);
+            }
+
             GameObject letter = Instantiate(Resources.Load("Prefabs/LetterButton", typeof(GameObject))) as GameObject;
             if (letter != null)
             {
-                letter.transform.SetParent(rt);
+                letter.transform.SetParent(placeholder.GetComponent<RectTransform>());
+                letter.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize, cellSize);
+
                 letter.transform.localScale = new Vector3(1, 1, 1);
 
                 var letB = letter.GetComponent<LetterButton>();
