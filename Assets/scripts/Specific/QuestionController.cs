@@ -14,10 +14,14 @@ public class QuestionController : MonoBehaviour
 
     public Dictionary<int, Letter> WordLetters;
 
-    public int LastAvailablePlace;
+    public int LastAvailablePlace, FirstAvailablePlace;
+
+    public int CurrentWordLetter = 0;
 
     public void Init()
     {
+        CurrentWordLetter = 0;
+
         BuildWords(Main.Instance().GameController.PublicWord);
     }
     
@@ -66,6 +70,7 @@ public class QuestionController : MonoBehaviour
         }
 
         CalculateLastAvailablePlace();
+        CalculateFirstAvailablePlace();
     }
     
     public string GenerateHidden(string word)
@@ -116,6 +121,55 @@ public class QuestionController : MonoBehaviour
         return word;
     }
 
+    public bool CalculateAvailableLetterIndex(bool forward)
+    {
+        bool isEndPoint = false;
+        if (forward)
+        {
+            if (CurrentWordLetter == LastAvailablePlace)
+                return true;
+
+            // Skip predefined as answered letters and calculate our new current letter space index.
+            if (WordLetters[CurrentWordLetter].Predefined)
+            {
+                if (DebugScript)
+                    Debug.Log(WordLetters[CurrentWordLetter].Index + ", t: " +
+                              WordLetters[CurrentWordLetter].Text.text + ", predef: " +
+                              WordLetters[CurrentWordLetter].Predefined);
+
+                for (var i = CurrentWordLetter; i < WordLetters.Count; i++)
+                {
+                    if (WordLetters[i].Predefined == false)
+                        break;
+                    CurrentWordLetter++;
+                }
+            }
+        }
+        else
+        {
+            if (CurrentWordLetter == FirstAvailablePlace)
+                return true;
+
+            if (WordLetters[CurrentWordLetter - 1].Predefined)
+            {
+                if (DebugScript)
+                    Debug.Log(WordLetters[CurrentWordLetter].Index + ", t: " +
+                              WordLetters[CurrentWordLetter].Text.text + ", predef: " +
+                              WordLetters[CurrentWordLetter].Predefined);
+
+                for (var i = CurrentWordLetter - 1; i >= 0; i--)
+                {
+                    if (WordLetters[i].Predefined == false)
+                        break;
+                    CurrentWordLetter--;
+                }
+            }
+            CurrentWordLetter--;
+        }
+
+        return isEndPoint;
+    }
+
     private string RemoveLetter(int i, string word, bool forceDelete, ref int cD)
     {
         if (CorrectLetters.ContainsKey(i))
@@ -133,7 +187,7 @@ public class QuestionController : MonoBehaviour
 
         return word;
     }
-
+    
     public void CalculateLastAvailablePlace()
     {
         for (var i = WordLetters.Count - 1; i >= 0; i--)
@@ -141,6 +195,18 @@ public class QuestionController : MonoBehaviour
             if (WordLetters[i].Predefined == false)
             {
                 LastAvailablePlace = i + 1;
+                break;
+            }
+        }
+    }
+
+    public void CalculateFirstAvailablePlace()
+    {
+        for (var i = 0; i < WordLetters.Count; i++)
+        {
+            if (WordLetters[i].Predefined == false)
+            {
+                FirstAvailablePlace = i;
                 break;
             }
         }

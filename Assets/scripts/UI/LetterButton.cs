@@ -9,12 +9,15 @@ public class LetterButton : MonoBehaviour
 
     public Text Text;
 
+    public RectTransform Rt;
+
     public delegate void OnClickListener(int index, string letter);
 
     public void Init(int i, string correctLetter,
         OnClickListener onClickListener)
     {
         Index = i;
+        Rt = GetComponent<RectTransform>();
 
         Transform[] childList = GetComponentsInChildren<Transform>(true);
         foreach (Transform child in childList)

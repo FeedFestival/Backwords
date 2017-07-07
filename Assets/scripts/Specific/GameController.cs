@@ -13,8 +13,6 @@ public class GameController : MonoBehaviour
 
     public string PublicWord;
 
-    public int CurrentWordLetter = 0;
-
     private Level _currentLevel;
 
     public void Init()
@@ -49,7 +47,6 @@ public class GameController : MonoBehaviour
         }
 
         PublicWord = level.Word;
-        CurrentWordLetter = 0;
 
         var img = Main.Instance().scope["QuestionPicture"].GetComponent<Image>();
         var sprite = Resources.Load<Sprite>("Pictures/" + PublicWord);
@@ -60,60 +57,52 @@ public class GameController : MonoBehaviour
         AnswersController.Init();
     }
 
-    public void OnWordsClick()  // move to GameLogic
+    public void OnWordsClick()  // Remove the Letter from the question.
     {
-        Debug.Log(QuestionController.WordLetters[CurrentWordLetter - 1].Predefined);
-        if (QuestionController.WordLetters[CurrentWordLetter - 1].Predefined)
-        {
-            if (DebugScript)
-                Debug.Log(QuestionController.WordLetters[CurrentWordLetter].Index + ", t: " +
-                          QuestionController.WordLetters[CurrentWordLetter].Text.text + ", predef: " +
-                          QuestionController.WordLetters[CurrentWordLetter].Predefined);
+        if (DebugScript)
+            Debug.Log(QuestionController.WordLetters[QuestionController.CurrentWordLetter - 1].Predefined);
 
-            for (var i = CurrentWordLetter - 1; i >= 0; i--)
-            {
-                if (QuestionController.WordLetters[i].Predefined == false)
-                    break;
-                CurrentWordLetter--;
-            }
-        }
+        var isEndPoint = QuestionController.CalculateAvailableLetterIndex(forward: false);
 
-        CurrentWordLetter--;
+        if (isEndPoint)
+            return;
 
-        var index = CurrentWordLetter;
-        QuestionController.WordLetters[index].Text.text = " ";
+        /*
+         anim - s
+         */
 
-        AnswersController.AllLetters[QuestionController.WordLetters[index].HiddenLetterButtonIndex].Show(true);
+        QuestionController.WordLetters[QuestionController.CurrentWordLetter].Text.text = " ";
+        AnswersController.AllLetters[QuestionController.WordLetters[QuestionController.CurrentWordLetter].HiddenLetterButtonIndex].Show(true);
+
+        /*
+         anim - end
+         */
+
     }
 
     public void OnClickLetter(int index, string letter)
     {
-        Debug.Log(CurrentWordLetter + " - " + QuestionController.LastAvailablePlace);
-        
-        // Destroy the letter from the Letters list or hide using the index.
-        AnswersController.AllLetters[index].Show(false);
+        if (DebugScript)
+            Debug.Log(QuestionController.CurrentWordLetter + " - " + QuestionController.LastAvailablePlace);
 
-        // Skip predefined as answered letters.
-        if (QuestionController.WordLetters[CurrentWordLetter].Predefined)
-        {
-            if (DebugScript)
-                Debug.Log(QuestionController.WordLetters[CurrentWordLetter].Index + ", t: " + QuestionController.WordLetters[CurrentWordLetter].Text.text + ", predef: " + QuestionController.WordLetters[CurrentWordLetter].Predefined);
+        var isEndPoint = QuestionController.CalculateAvailableLetterIndex(forward: true);
 
-            for (var i = CurrentWordLetter; i < QuestionController.WordLetters.Count; i++)
-            {
-                if (QuestionController.WordLetters[i].Predefined == false)
-                    break;
-                CurrentWordLetter++;
-            }
-        }
+        if (isEndPoint)
+            return;
 
-        // Add the letter to the current index in the word.
-        QuestionController.WordLetters[CurrentWordLetter].Text.text = letter;
-        QuestionController.WordLetters[CurrentWordLetter].HiddenLetterButtonIndex = index;
+        /*
+         anim - s
+         */
 
-        CurrentWordLetter++;
+        AnimateLetterPlacing(AnswersController.AllLetters[index], QuestionController.WordLetters[QuestionController.CurrentWordLetter], index);
 
-        if (CurrentWordLetter == QuestionController.LastAvailablePlace)
+        /*
+         anim - end
+         */
+
+
+        QuestionController.CurrentWordLetter++;
+        if (QuestionController.CurrentWordLetter == QuestionController.LastAvailablePlace)
         {
             Debug.Log("Check if game can end...");
 
@@ -150,5 +139,58 @@ public class GameController : MonoBehaviour
             reverse += cArray[i];
         }
         return reverse;
+    }
+
+    private void AnimateLetterPlacing(LetterButton answerLetter, Letter questionLetterSpace, int index)
+    {
+        var globalParent = Main.Instance().scope["GameView"].GetComponent<RectTransform>();
+        
+        answerLetter.Show(false);
+
+        var animLetter = GetAnimationLetter(answerLetter.Text.text);
+        
+        var aRt = animLetter.GetComponent<RectTransform>();
+        aRt.position = answerLetter.Rt.position;
+        aRt.sizeDelta = new Vector2(answerLetter.Rt.sizeDelta.x, answerLetter.Rt.sizeDelta.y);
+        
+        // Animate moving towards the available space.
+
+        // handle everything within a callback.
+
+
+
+
+        // old way
+
+        // Add the letter to the current index in the word.
+        //questionLetterSpace.Text.text = letter;
+        //questionLetterSpace.HiddenLetterButtonIndex = index;
+    }
+
+    private GameObject _animationLetter;
+    private GameObject GetAnimationLetter(string c)
+    {
+        if (_animationLetter != null)
+        {
+            _animationLetter.GetComponent<LetterButton>().Text.text = c;
+            return _animationLetter;
+        }
+        else
+        {
+            _animationLetter = Instantiate(Resources.Load("Prefabs/LetterButton", typeof(GameObject))) as GameObject;
+            if (_animationLetter != null)
+            {
+                var layE = _animationLetter.gameObject.AddComponent<LayoutElement>();
+                layE.ignoreLayout = true;
+
+                _animationLetter.transform.SetParent(Main.Instance().scope["GameView"].GetComponent<RectTransform>());
+                _animationLetter.transform.localScale = new Vector3(1, 1, 1);
+
+                var letB = _animationLetter.GetComponent<LetterButton>();
+                letB.Init(100, c,
+                    null);
+            }
+            return _animationLetter;
+        }
     }
 }
