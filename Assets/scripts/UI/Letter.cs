@@ -7,10 +7,10 @@ public class Letter : MonoBehaviour
 {
     public int Index;
     public bool Predefined;
-    public Text Text;
+    public string Text;
     public RectTransform Rt;
-    public int HiddenLetterButtonIndex;
-
+    public int PlaceholderIndex;
+    
     public void Init(int i, string c)
     {
         Index = i;
@@ -20,16 +20,7 @@ public class Letter : MonoBehaviour
             Predefined = false;
         else
             Predefined = true;
-
-        Transform[] childList = GetComponentsInChildren<Transform>(true);
-        foreach (Transform child in childList)
-        {
-            if (child.name.Equals("(Text)"))
-            {
-                Text = child.gameObject.GetComponent<Text>();
-            }
-        }
-
-        Text.text= c;
+        
+        Text = c;
     }
 }

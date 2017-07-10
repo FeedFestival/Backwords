@@ -66,6 +66,27 @@ public class QuestionController : MonoBehaviour
                 letterObj.Init(i, wordLetters[i]);
 
                 WordLetters.Add(i, letterObj);
+
+                // for predefined build a keyboard letter.
+
+                if (letterObj.Predefined)
+                {
+                    GameObject aLetter = Instantiate(Resources.Load("Prefabs/LetterButton", typeof(GameObject))) as GameObject;
+                    if (aLetter != null)
+                    {
+                        aLetter.transform.SetParent(letter.GetComponent<RectTransform>());
+                        aLetter.GetComponent<RectTransform>().sizeDelta = new Vector2(cellSize, cellSize);
+
+                        aLetter.transform.localScale = new Vector3(1, 1, 1);
+
+                        var answerLetter = aLetter.GetComponent<LetterButton>();
+                        answerLetter.Init(i, wordLetters[i]
+                            , null);
+
+                        // disabled the button
+                        answerLetter.Button.interactable = false;
+                    }
+                }
             }
         }
 
@@ -134,7 +155,7 @@ public class QuestionController : MonoBehaviour
             {
                 if (DebugScript)
                     Debug.Log(WordLetters[CurrentWordLetter].Index + ", t: " +
-                              WordLetters[CurrentWordLetter].Text.text + ", predef: " +
+                              WordLetters[CurrentWordLetter].Text + ", predef: " +
                               WordLetters[CurrentWordLetter].Predefined);
 
                 for (var i = CurrentWordLetter; i < WordLetters.Count; i++)
@@ -154,7 +175,7 @@ public class QuestionController : MonoBehaviour
             {
                 if (DebugScript)
                     Debug.Log(WordLetters[CurrentWordLetter].Index + ", t: " +
-                              WordLetters[CurrentWordLetter].Text.text + ", predef: " +
+                              WordLetters[CurrentWordLetter].Text + ", predef: " +
                               WordLetters[CurrentWordLetter].Predefined);
 
                 for (var i = CurrentWordLetter - 1; i >= 0; i--)

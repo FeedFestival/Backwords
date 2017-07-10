@@ -39,7 +39,7 @@ public class LevelController : MonoBehaviour
         Levels.Add(5, new Level
         {
             Id = 5,
-            Word = "machiaj"
+            Word = "bujii"
         });
 
         Levels.Add(6, new Level

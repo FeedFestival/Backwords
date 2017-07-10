@@ -6,18 +6,21 @@ using UnityEngine.UI;
 public class LetterButton : MonoBehaviour
 {
     public int Index;
-
     public Text Text;
-
     public RectTransform Rt;
+    public Vector3 PlaceholderPosition;
+    public Button Button;
 
     public delegate void OnClickListener(int index, string letter);
+
+    public bool AsAnswer;
 
     public void Init(int i, string correctLetter,
         OnClickListener onClickListener)
     {
         Index = i;
         Rt = GetComponent<RectTransform>();
+        Button = GetComponent<Button>();
 
         Transform[] childList = GetComponentsInChildren<Transform>(true);
         foreach (Transform child in childList)
@@ -30,15 +33,21 @@ public class LetterButton : MonoBehaviour
 
         Text.text = correctLetter;
 
-        GetComponent<Button>().onClick.AddListener(() =>
+        Button.onClick.AddListener(() =>
         {
-            onClickListener(Index, Text.text);
+            if (AsAnswer)
+            {
+                Main.Instance().GameController.OnWordsClick();
+            }
+            else
+            {
+                onClickListener(Index, Text.text);
+            }
         });
     }
 
-    public void Show(bool val)
+    public void UpdateLetterScale(Vector2 newValue)
     {
-        GetComponent<Image>().enabled = val;
-        Text.enabled = val;
+        Rt.sizeDelta = newValue;
     }
 }
