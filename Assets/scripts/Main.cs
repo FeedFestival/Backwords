@@ -55,7 +55,7 @@ public class Main : MonoBehaviour
 
     IEnumerator ShowIntro(OnSplashFinish onSplashFinish)
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.1f);
 
         onSplashFinish();
     }

@@ -53,6 +53,11 @@ public class LevelController : MonoBehaviour
          * 
          * */
 
+        for (var i = 7; i < 35; i++)
+        {
+            Levels.Add(i, new Level { Id = i, Word = "test" });
+        }
+
         gameObject.SetActive(true);
 
         StartCoroutine(ShowLevels());
@@ -66,19 +71,18 @@ public class LevelController : MonoBehaviour
         var gridLayoutGroup = Main.Instance().scope["LevelGrid"].GetComponent<GridLayoutGroup>();
 
         var width = rt.sizeDelta.x;
-        var height = rt.sizeDelta.y;
-
+        
         var cellSize = width / 6;
-
-        var cellSizeY = height / 3;
-
-        var paddingY = utils.GetPercent(cellSizeY, 30);
+        
         var paddingX = utils.GetPercent(cellSize, 20);
-        Debug.Log(paddingY);
+        
+        gridLayoutGroup.cellSize = new Vector2(cellSize - paddingX, cellSize - paddingX);
 
+        var rows = (int)Levels.Count / 6;
+        var parentHeight = rows * (cellSize - paddingX);
+        parentHeight = parentHeight + utils.GetPercent(parentHeight, 5);
 
-        gridLayoutGroup.spacing = new Vector2(paddingX / 2, paddingY / 2);
-        gridLayoutGroup.cellSize = new Vector2(cellSize - paddingX, cellSizeY - paddingY);
+        rt.sizeDelta = new Vector2(rt.sizeDelta.x, parentHeight);
 
         LevelButtons = new List<CButton>();
         for (var i = 1; i <= Levels.Count; i++)
