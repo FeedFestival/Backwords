@@ -76,8 +76,7 @@ public class GameController : MonoBehaviour
             return;
 
         StartCoroutine(
-            AnimteLetterUnplacing(QuestionController.WordLetters[QuestionController.CurrentWordLetter],
-                                  AnswersController.AllLetters[QuestionController.WordLetters[QuestionController.CurrentWordLetter].PlaceholderIndex])
+            AnimteLetterUnplacing(AnswersController.AllLetters[QuestionController.WordLetters[QuestionController.CurrentWordLetter].PlaceholderIndex])
             );
 
         QuestionController.WordLetters[QuestionController.CurrentWordLetter].Text = " ";
@@ -138,9 +137,16 @@ public class GameController : MonoBehaviour
             _onLeveCompleted(_currentLevel.Id);
         }
         else
+        {
             Debug.Log(compiledWord.ToUpper() + " != " + PublicWord.ToUpper() + "Incorrect :(");
-    }
 
+            var lastIndex = QuestionController.LastAvailablePlace - 1;
+            StartCoroutine(
+                ReturnLastIncorrectLetter(AnswersController.AllLetters[QuestionController.WordLetters[lastIndex].PlaceholderIndex], QuestionController.WordLetters[lastIndex - 1])
+            );
+        }
+    }
+    
     public string Reverse(string text)
     {
         text = text.ToUpper();
@@ -199,7 +205,7 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(_animationTime);
     }
 
-    IEnumerator AnimteLetterUnplacing(Letter questionLetterSpace, LetterButton answerLetter)
+    IEnumerator AnimteLetterUnplacing(LetterButton answerLetter)
     {
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", answerLetter.PlaceholderPosition,
@@ -217,5 +223,68 @@ public class GameController : MonoBehaviour
 
         // enable the button
         answerLetter.AsAnswer = false;
+    }
+
+    private float _nonoSplitDuration = 0.15f;
+
+    IEnumerator ReturnLastIncorrectLetter(LetterButton answerLetter, Letter letterSpace)
+    {
+        // stop all attempt at placing. 
+
+        // play the no-no animation.
+        var width = letterSpace.Rt.sizeDelta.x;
+        
+        var tempPos = transform.InverseTransformPoint(answerLetter.Rt.position);
+        tempPos = new Vector3(tempPos.x - (width / 2), tempPos.y, tempPos.z);
+
+        var leftPos = transform.TransformPoint(tempPos);
+
+        tempPos = new Vector3(tempPos.x + width, tempPos.y, tempPos.z);
+
+        var rightPos = transform.TransformPoint(tempPos);
+
+        var originalPos =  answerLetter.Rt.position;
+
+        //Debug.Log(letterSpace.Rt.position);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", leftPos,
+            "time", _nonoSplitDuration / 2));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", rightPos,
+            "time", _nonoSplitDuration));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", leftPos,
+            "time", _nonoSplitDuration));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", rightPos,
+            "time", _nonoSplitDuration));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", leftPos,
+            "time", _nonoSplitDuration));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
+            "position", originalPos,
+            "time", _nonoSplitDuration /2));
+
+        yield return new WaitForSeconds(_nonoSplitDuration);
+
+        // leave back all attempt at placing to true.
+
+        OnWordsClick();
     }
 }

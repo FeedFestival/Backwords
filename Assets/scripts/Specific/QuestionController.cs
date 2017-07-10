@@ -216,6 +216,7 @@ public class QuestionController : MonoBehaviour
             if (WordLetters[i].Predefined == false)
             {
                 LastAvailablePlace = i + 1;
+                
                 break;
             }
         }
