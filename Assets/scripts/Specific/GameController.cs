@@ -225,7 +225,7 @@ public class GameController : MonoBehaviour
         answerLetter.AsAnswer = false;
     }
 
-    private float _nonoSplitDuration = 0.15f;
+    private float _nonoSplitDuration = 0.075f;
 
     IEnumerator ReturnLastIncorrectLetter(LetterButton answerLetter, Letter letterSpace)
     {
@@ -235,11 +235,11 @@ public class GameController : MonoBehaviour
         var width = letterSpace.Rt.sizeDelta.x;
         
         var tempPos = transform.InverseTransformPoint(answerLetter.Rt.position);
-        tempPos = new Vector3(tempPos.x - (width / 2), tempPos.y, tempPos.z);
+        tempPos = new Vector3(tempPos.x - (width / 6), tempPos.y, tempPos.z);
 
         var leftPos = transform.TransformPoint(tempPos);
 
-        tempPos = new Vector3(tempPos.x + width, tempPos.y, tempPos.z);
+        tempPos = new Vector3(tempPos.x + (width / 3), tempPos.y, tempPos.z);
 
         var rightPos = transform.TransformPoint(tempPos);
 
@@ -249,37 +249,43 @@ public class GameController : MonoBehaviour
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration / 2));
+            "time", _nonoSplitDuration / 2,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", rightPos,
-            "time", _nonoSplitDuration));
+            "time", _nonoSplitDuration,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration));
+            "time", _nonoSplitDuration,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", rightPos,
-            "time", _nonoSplitDuration));
+            "time", _nonoSplitDuration,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration));
+            "time", _nonoSplitDuration,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", originalPos,
-            "time", _nonoSplitDuration /2));
+            "time", _nonoSplitDuration /2,
+            "easetype", "easeInCirc"));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
