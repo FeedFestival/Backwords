@@ -57,8 +57,11 @@ public class GameController : MonoBehaviour
 
         PublicWord = level.Word;
 
+        var levelImage = level.Image.Remove(level.Image.Length - 4, 4);
+        Debug.Log(levelImage);
+
         var img = Main.Instance().scope["QuestionPicture"].GetComponent<Image>();
-        var sprite = Resources.Load<Sprite>("Pictures/" + PublicWord);
+        var sprite = Resources.Load<Sprite>("Pictures/" + levelImage);
         img.sprite = sprite;
 
         // statr the game view

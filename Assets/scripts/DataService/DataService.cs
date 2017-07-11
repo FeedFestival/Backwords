@@ -74,18 +74,21 @@ public class DataService
         _connection.CreateTable<User>();
     }
 
+    public void CleanUpLevels()
+    {
+        _connection.DropTable<Level>();
+        _connection.CreateTable<Level>();
+    }
+
     public void CreateDB()
     {
-        _connection.DropTable<User>();
-        _connection.CreateTable<User>();
+        if (_connection.Table<User>().Where(x => x.Id == 1).FirstOrDefault() == null)
+        {
+            _connection.CreateTable<User>();
+        }
 
-
-
-        //_connection.DropTable<Map>();
-        //_connection.CreateTable<Map>();
-
-        //_connection.DropTable<MapTile>();
-        //_connection.CreateTable<MapTile>();
+        _connection.DropTable<Level>();
+        _connection.CreateTable<Level>();
     }
 
     /*
@@ -173,11 +176,17 @@ public class DataService
     //    var sql = string.Format("delete from MapTile where MapId = {0}", mapId);
     //    _connection.ExecuteSql(sql);
     //}
-    
+
     /*
      * Map - END
      * * --------------------------------------------------------------------------------------------------------------------------------------
      */
+
+    public void CreateLevel(Level level)
+    {
+        _connection.Insert(level);
+    }
+
     public IEnumerable<Level> GetLevels()
     {
         return _connection.Table<Level>().Where(x => x.Id > 0);

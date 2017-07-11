@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,48 +13,13 @@ public class LevelController : MonoBehaviour
 
     public void Init()
     {
-        //Levels.Add(1, new Level
-        //{
-        //    Id = 1,
-        //    Word = "ace"
-        //});
-
-        //Levels.Add(2, new Level
-        //{
-        //    Id = 2,
-        //    Word = "Pasare"
-        //});
-
-        //Levels.Add(3, new Level
-        //{
-        //    Id = 3,
-        //    Word = "cub"
-        //});
-
-        //Levels.Add(4, new Level
-        //{
-        //    Id = 4,
-        //    Word = "felinar"
-        //});
-
-        //Levels.Add(5, new Level
-        //{
-        //    Id = 5,
-        //    Word = "bujii"
-        //});
-
-        //Levels.Add(6, new Level
-        //{
-        //    Id = 6,
-        //    Word = "desoxirribonucleic"
-        //});
-        
-        //for (var i = 7; i < 35; i++)
-        //{
-        //    Levels.Add(i, new Level { Id = i, Word = "test" });
-        //}
-
         var levels = Main.Instance().DataService.GetLevels();
+        
+        Levels = new Dictionary<int, Level>();
+        foreach (Level level in levels)
+        {
+            Levels.Add(level.Id, level);
+        }
 
         if (Levels != null && Levels.Count > 0)
         {
@@ -70,11 +36,11 @@ public class LevelController : MonoBehaviour
         var gridLayoutGroup = Main.Instance().scope["LevelGrid"].GetComponent<GridLayoutGroup>();
 
         var width = rt.sizeDelta.x;
-        
+
         var cellSize = width / 6;
-        
+
         var paddingX = utils.GetPercent(cellSize, 20);
-        
+
         gridLayoutGroup.cellSize = new Vector2(cellSize - paddingX, cellSize - paddingX);
 
         var rows = (int)Levels.Count / 6;

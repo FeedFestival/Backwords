@@ -13,7 +13,8 @@ public class Main : MonoBehaviour
         return _main;
     }
 
-    private User _loggedUser;
+    public User LoggedUser;
+
 
     [HideInInspector]
     public DataService DataService;
@@ -24,6 +25,8 @@ public class Main : MonoBehaviour
     public GameController GameController;
     [HideInInspector]
     public LevelController LevelController;
+    [HideInInspector]
+    public LocaleController LocaleController;
 
     void Awake()
     {
@@ -42,19 +45,20 @@ public class Main : MonoBehaviour
         LevelController = scope["LevelView"].GetComponent<LevelController>();
         LevelController.gameObject.SetActive(false);
 
+        LocaleController = scope["LocaleView"].GetComponent<LocaleController>();
+        LocaleController.gameObject.SetActive(false);
+
         scope["Splash"].SetActive(true);
         StartCoroutine(
             ShowIntro(() =>
         {
             scope["Splash"].SetActive(false);
 
-            LevelController.Init();
+            LocaleController.Init();
         }));
 
         scope["LevelCompletedSplash"].SetActive(false);
-
-
-
+        
         /*
          * ---------------------------------------------------------------------
          * * ---------------------------------------------------------------------
@@ -68,30 +72,32 @@ public class Main : MonoBehaviour
     // callbacks
     public delegate void OnSplashFinish();
 
-    
+
     IEnumerator ShowIntro(OnSplashFinish onSplashFinish)
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(2f);
 
         onSplashFinish();
     }
-    
+
     public void CreateSession()
     {
-        _loggedUser = DataService.GetUser();
-        Debug.Log(_loggedUser);
-        if (_loggedUser == null)
+        LoggedUser = DataService.GetUser();
+        if (LoggedUser == null)
         {
             DataService.CreateDB();
-
             var user = new User
             {
                 Id = 1,
                 Name = "Player 1",
+                Language = "en_US",
                 Maps = 0
             };
-
+            Debug.Log("This is a fresh install. Creating user..." + user);
             DataService.CreateUser(user);
+            //
+            LoggedUser = DataService.GetUser();
         }
+        Debug.Log("Logged in. " + LoggedUser);
     }
 }
