@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -115,7 +114,7 @@ public class QuestionController : MonoBehaviour
                     continue;
                 }
 
-                var penny = Main.Instance().GetPennyToss();
+                var penny = utils.GetPennyToss();
 
                 if ((i - 2) >= 0 && word[i - 1] != ' ' && word[i - 2] != ' ')
                 {

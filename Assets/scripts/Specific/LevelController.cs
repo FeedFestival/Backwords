@@ -6,61 +6,60 @@ using UnityEngine.UI;
 
 public class LevelController : MonoBehaviour
 {
-    public Dictionary<int, Level> Levels = new Dictionary<int, Level>();
+    public Dictionary<int, Level> Levels;
 
     public List<CButton> LevelButtons;
 
     public void Init()
     {
-        Levels.Add(1, new Level
-        {
-            Id = 1,
-            Word = "ace"
-        });
+        //Levels.Add(1, new Level
+        //{
+        //    Id = 1,
+        //    Word = "ace"
+        //});
 
-        Levels.Add(2, new Level
-        {
-            Id = 2,
-            Word = "Pasare"
-        });
+        //Levels.Add(2, new Level
+        //{
+        //    Id = 2,
+        //    Word = "Pasare"
+        //});
 
-        Levels.Add(3, new Level
-        {
-            Id = 3,
-            Word = "cub"
-        });
+        //Levels.Add(3, new Level
+        //{
+        //    Id = 3,
+        //    Word = "cub"
+        //});
 
-        Levels.Add(4, new Level
-        {
-            Id = 4,
-            Word = "felinar"
-        });
+        //Levels.Add(4, new Level
+        //{
+        //    Id = 4,
+        //    Word = "felinar"
+        //});
 
-        Levels.Add(5, new Level
-        {
-            Id = 5,
-            Word = "bujii"
-        });
+        //Levels.Add(5, new Level
+        //{
+        //    Id = 5,
+        //    Word = "bujii"
+        //});
 
-        Levels.Add(6, new Level
-        {
-            Id = 6,
-            Word = "desoxirribonucleic"
-        });
+        //Levels.Add(6, new Level
+        //{
+        //    Id = 6,
+        //    Word = "desoxirribonucleic"
+        //});
+        
+        //for (var i = 7; i < 35; i++)
+        //{
+        //    Levels.Add(i, new Level { Id = i, Word = "test" });
+        //}
 
-        /*
-         * 
-         * 
-         * */
+        var levels = Main.Instance().DataService.GetLevels();
 
-        for (var i = 7; i < 35; i++)
+        if (Levels != null && Levels.Count > 0)
         {
-            Levels.Add(i, new Level { Id = i, Word = "test" });
+            gameObject.SetActive(true);
+            StartCoroutine(ShowLevels());
         }
-
-        gameObject.SetActive(true);
-
-        StartCoroutine(ShowLevels());
     }
 
     IEnumerator ShowLevels()
@@ -133,10 +132,4 @@ public class LevelController : MonoBehaviour
         Main.Instance().GameController.Init();
         Main.Instance().GameController.StartGame(Levels[index + 1], OnLeveCompleted);
     }
-}
-
-public class Level
-{
-    public int Id;
-    public string Word;
 }

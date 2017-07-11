@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Assets.scripts.utils;
 using UnityEngine;
-using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class Main : MonoBehaviour
 {
@@ -16,8 +13,16 @@ public class Main : MonoBehaviour
         return _main;
     }
 
+    private User _loggedUser;
+
+    [HideInInspector]
+    public DataService DataService;
+
+    [HideInInspector]
     public Dictionary<string, GameObject> scope;
+    [HideInInspector]
     public GameController GameController;
+    [HideInInspector]
     public LevelController LevelController;
 
     void Awake()
@@ -47,30 +52,46 @@ public class Main : MonoBehaviour
         }));
 
         scope["LevelCompletedSplash"].SetActive(false);
+
+
+
+        /*
+         * ---------------------------------------------------------------------
+         * * ---------------------------------------------------------------------
+         * * ---------------------------------------------------------------------
+         */
+
+        DataService = new DataService("Database.db");
+        CreateSession();
     }
 
     // callbacks
     public delegate void OnSplashFinish();
 
-
+    
     IEnumerator ShowIntro(OnSplashFinish onSplashFinish)
     {
         yield return new WaitForSeconds(0.1f);
 
         onSplashFinish();
     }
-
-    public int GetPennyToss()
+    
+    public void CreateSession()
     {
-        var randomNumber = Random.Range(0, 100);
-        return (randomNumber > 50) ? 1 : 0;
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
+        _loggedUser = DataService.GetUser();
+        Debug.Log(_loggedUser);
+        if (_loggedUser == null)
         {
-            //GameController.StartGame();
+            DataService.CreateDB();
+
+            var user = new User
+            {
+                Id = 1,
+                Name = "Player 1",
+                Maps = 0
+            };
+
+            DataService.CreateUser(user);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,16 +30,16 @@ public class AnswersController : MonoBehaviour
         {
             // just to have it a little bit more random
             totalLetters = Main.Instance().GameController.QuestionController.CorrectLetters.Count * 3;
-            totalLetters += Main.Instance().GetPennyToss();
-            totalLetters += Main.Instance().GetPennyToss();
+            totalLetters += utils.GetPennyToss();
+            totalLetters += utils.GetPennyToss();
             gridLayoutGroup.constraintCount = 8;
         }
         else
         {
             var tot = (float)Main.Instance().GameController.QuestionController.CorrectLetters.Count * 1.5f;
             totalLetters = (int)tot;
-            totalLetters += Main.Instance().GetPennyToss();
-            totalLetters += Main.Instance().GetPennyToss();
+            totalLetters += utils.GetPennyToss();
+            totalLetters += utils.GetPennyToss();
             //
             gridLayoutGroup.constraintCount = (totalLetters / 2) + 1;
         }
