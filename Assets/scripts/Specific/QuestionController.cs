@@ -116,7 +116,7 @@ public class QuestionController : MonoBehaviour
 
                 var penny = utils.GetPennyToss();
 
-                if ((i - 2) >= 0 && word[i - 1] != ' ' && word[i - 2] != ' ')
+                if ((i - 2) >= 0 && word[i - 1] != '#' && word[i - 2] != '#')
                 {
                     penny = 0;
                 }
@@ -132,7 +132,7 @@ public class QuestionController : MonoBehaviour
 
         for (var i = 0; i < length; i++)
         {
-            if ((i - 2) >= 0 && word[i - 1] != ' ' && word[i - 2] != ' ')
+            if ((i - 2) >= 0 && word[i - 1] != '#' && word[i - 2] != '#')
             {
                 word = RemoveLetter(i, word, true, ref currentDeleted);
             }
@@ -143,7 +143,6 @@ public class QuestionController : MonoBehaviour
 
     public bool CalculateAvailableLetterIndex(bool forward)
     {
-        bool isEndPoint = false;
         if (forward)
         {
             if (CurrentWordLetter == LastAvailablePlace)
@@ -186,8 +185,7 @@ public class QuestionController : MonoBehaviour
             }
             CurrentWordLetter--;
         }
-
-        return isEndPoint;
+        return false;
     }
 
     private string RemoveLetter(int i, string word, bool forceDelete, ref int cD)
@@ -199,7 +197,7 @@ public class QuestionController : MonoBehaviour
             return word;
 
         CorrectLetters.Add(i, word[i].ToString());
-        word = word.Remove(i, 1).Insert(i, " ");
+        word = word.Remove(i, 1).Insert(i, "#");
         cD++;
 
         if (DebugScript)
