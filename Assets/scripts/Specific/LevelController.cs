@@ -58,9 +58,11 @@ public class LevelController : MonoBehaviour
                 letter.transform.SetParent(rt);
                 letter.transform.localScale = new Vector3(1, 1, 1);
 
+                var locked = i > Main.Instance().LoggedUser.Maps;
+
                 var but = letter.GetComponent<CButton>();
                 but.Init(i, i.ToString(),
-                    OnLevelSelected);
+                    OnLevelSelected, locked:locked);
 
                 LevelButtons.Add(but);
             }
@@ -84,6 +86,10 @@ public class LevelController : MonoBehaviour
         // Coroutine requirements
         Main.Instance().scope["LevelGrid"].SetActive(false);
         gameObject.SetActive(true);
+
+        var user = Main.Instance().LoggedUser;
+        user.Maps++;
+        Main.Instance().DataService.UpdateUser(user);
 
         StartCoroutine(LevelCompletedSplash(index));
     }

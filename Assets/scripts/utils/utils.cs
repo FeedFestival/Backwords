@@ -190,5 +190,16 @@ namespace Assets.scripts.utils
 
             return success ? numb : 0;
         }
+
+        private static int _originalFontSize = 14;
+
+        public static int GetLetterFontSize(RectTransform Rt)
+        {
+            if (Rt.sizeDelta.x < 91 && Rt.sizeDelta.x > 80)
+            {
+                return _originalFontSize * 4;
+            }
+            return _originalFontSize;
+        }
     }
 }

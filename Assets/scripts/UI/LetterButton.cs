@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -32,6 +33,9 @@ public class LetterButton : MonoBehaviour
         }
 
         Text.text = correctLetter;
+        
+        Debug.Log(Rt.sizeDelta.x);
+        //Text.fontSize = utils.GetLetterFontSize(Rt);
 
         Button.onClick.AddListener(() =>
         {

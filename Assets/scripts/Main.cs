@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.scripts.utils;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
@@ -98,6 +99,16 @@ public class Main : MonoBehaviour
             //
             LoggedUser = DataService.GetUser();
         }
+
+        if (LoggedUser.Maps == 0)
+        {
+            LoggedUser.Maps = 1;
+        }
+
+        scope["RomaniaMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
+        scope["EnglishMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
+        scope["PMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
+
         Debug.Log("Logged in. " + LoggedUser);
     }
 }

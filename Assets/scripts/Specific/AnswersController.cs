@@ -10,6 +10,9 @@ public class AnswersController : MonoBehaviour
 
     public GameObject LetterContainer;
 
+    private const int MaxAdditionalLetters = 4;
+    private const int MinAdditionalLetters = 3;
+
     public void Init()
     {
         LetterContainer = Main.Instance().scope["LetterContainer"];
@@ -26,27 +29,56 @@ public class AnswersController : MonoBehaviour
 
         var width = rt.sizeDelta.x;
 
-        if (Main.Instance().GameController.QuestionController.CorrectLetters.Count < 7)
+        if (Main.Instance().GameController.QuestionController.CorrectLetters.Count < 5)
         {
-            // just to have it a little bit more random
-            totalLetters = Main.Instance().GameController.QuestionController.CorrectLetters.Count * 3;
-            totalLetters += utils.GetPennyToss();
-            totalLetters += utils.GetPennyToss();
+            totalLetters = Main.Instance().GameController.QuestionController.CorrectLetters.Count + 1;
+
+            var additionalLetters = 0;
+            for (var t = 0; t < Main.Instance().GameController.QuestionController.CorrectLetters.Count; t++)
+            {
+                var totLetters = totalLetters + utils.GetPennyToss();
+                if (totLetters != totalLetters)
+                {
+                    additionalLetters++;
+                    totalLetters = totLetters;
+                }
+
+                if (MaxAdditionalLetters == additionalLetters)
+                    break;
+            }
+            if (additionalLetters < MinAdditionalLetters)
+                totalLetters++;
+
             gridLayoutGroup.constraintCount = 8;
         }
         else
         {
-            var tot = (float)Main.Instance().GameController.QuestionController.CorrectLetters.Count * 1.5f;
+            var tot = (float)Main.Instance().GameController.QuestionController.CorrectLetters.Count / 2;
             totalLetters = (int)tot;
-            totalLetters += utils.GetPennyToss();
-            totalLetters += utils.GetPennyToss();
+
+            var additionalLetters = 0;
+            for (var t = 0; t < totalLetters; t++)
+            {
+                var totLetters = totalLetters + utils.GetPennyToss();
+                if (totLetters != totalLetters)
+                {
+                    additionalLetters++;
+                    totalLetters = totLetters;
+                }
+
+                if (MaxAdditionalLetters == additionalLetters)
+                    break;
+            }
+            if (additionalLetters < MinAdditionalLetters)
+                totalLetters++;
+
             //
             gridLayoutGroup.constraintCount = (totalLetters / 2) + 1;
         }
 
         var cellSize = width / totalLetters;
-        if (cellSize > 70)
-            cellSize = 70;
+        if (cellSize > 90)
+            cellSize = 90;
         gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
         //
 
