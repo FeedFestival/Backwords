@@ -9,11 +9,9 @@ public class CButton : MonoBehaviour
 
     public Text Text;
 
-    public Sprite NormalSprite;
-
     public delegate void OnButtonClicked(int index);
 
-    public void Init(int index, string text, OnButtonClicked onButtonClicked, bool locked)
+    public void Init(int index, string text, OnButtonClicked onButtonClicked)
     {
         Index = index;
 
@@ -26,15 +24,6 @@ public class CButton : MonoBehaviour
             }
         }
         Text.text = text;
-
-        if (locked)
-        {
-            var but = GetComponent<Button>();
-            but.interactable = false;
-            var image = GetComponent<Image>();
-            image.sprite = Resources.Load<Sprite>("UI/level-locked");
-            Text.enabled = false;
-        }
 
         GetComponent<Button>().onClick.AddListener(() =>
         {

@@ -16,7 +16,7 @@ public class Letter : MonoBehaviour
         Index = i;
         Rt = GetComponent<RectTransform>();
 
-        if (c == "#")
+        if (c == " ")
             Predefined = false;
         else
             Predefined = true;

@@ -21,8 +21,6 @@ public class GameController : MonoBehaviour
     private Coroutine _endAnimation;
     private bool _placingAnimationRunning;
 
-    public bool BlockInteraction = false;
-
     public void Init()
     {
         QuestionController = Main.Instance().scope["QuestionContainer"].GetComponent<QuestionController>();
@@ -59,11 +57,8 @@ public class GameController : MonoBehaviour
 
         PublicWord = level.Word;
 
-        var levelImage = level.Image.Remove(level.Image.Length - 4, 4);
-        Debug.Log(levelImage);
-
         var img = Main.Instance().scope["QuestionPicture"].GetComponent<Image>();
-        var sprite = Resources.Load<Sprite>("Pictures/" + levelImage);
+        var sprite = Resources.Load<Sprite>("Pictures/" + PublicWord);
         img.sprite = sprite;
 
         // statr the game view
@@ -73,9 +68,6 @@ public class GameController : MonoBehaviour
 
     public void OnWordsClick()  // Remove the Letter from the question.
     {
-        if (BlockInteraction)
-            return;
-
         if (DebugScript)
             Debug.Log(QuestionController.WordLetters[QuestionController.CurrentWordLetter - 1].Predefined);
 
@@ -87,14 +79,11 @@ public class GameController : MonoBehaviour
             AnimteLetterUnplacing(AnswersController.AllLetters[QuestionController.WordLetters[QuestionController.CurrentWordLetter].PlaceholderIndex])
             );
 
-        QuestionController.WordLetters[QuestionController.CurrentWordLetter].Text = "#";
+        QuestionController.WordLetters[QuestionController.CurrentWordLetter].Text = " ";
     }
 
     public void OnClickLetter(int index, string letter)
     {
-        if (BlockInteraction)
-            return;
-
         if (DebugScript)
             Debug.Log(QuestionController.CurrentWordLetter + " - " + QuestionController.LastAvailablePlace);
 
@@ -105,7 +94,7 @@ public class GameController : MonoBehaviour
         StartCoroutine(
             AnimateLetterPlacing(AnswersController.AllLetters[index], QuestionController.WordLetters[QuestionController.CurrentWordLetter])
             );
-
+        
         // Add the letter to the current index in the word.
         QuestionController.WordLetters[QuestionController.CurrentWordLetter].Text = AnswersController.AllLetters[index].Text.text;
 
@@ -157,7 +146,7 @@ public class GameController : MonoBehaviour
             );
         }
     }
-
+    
     public string Reverse(string text)
     {
         text = text.ToUpper();
@@ -236,78 +225,65 @@ public class GameController : MonoBehaviour
         answerLetter.AsAnswer = false;
     }
 
-    private float _nonoSplitDuration = 0.075f;
+    private float _nonoSplitDuration = 0.15f;
 
     IEnumerator ReturnLastIncorrectLetter(LetterButton answerLetter, Letter letterSpace)
     {
-
-        BlockInteraction = true;
-
-        /**/
+        // stop all attempt at placing. 
 
         // play the no-no animation.
         var width = letterSpace.Rt.sizeDelta.x;
-
+        
         var tempPos = transform.InverseTransformPoint(answerLetter.Rt.position);
-        tempPos = new Vector3(tempPos.x - (width / 6), tempPos.y, tempPos.z);
+        tempPos = new Vector3(tempPos.x - (width / 2), tempPos.y, tempPos.z);
 
         var leftPos = transform.TransformPoint(tempPos);
 
-        tempPos = new Vector3(tempPos.x + (width / 3), tempPos.y, tempPos.z);
+        tempPos = new Vector3(tempPos.x + width, tempPos.y, tempPos.z);
 
         var rightPos = transform.TransformPoint(tempPos);
 
-        var originalPos = answerLetter.Rt.position;
+        var originalPos =  answerLetter.Rt.position;
 
         //Debug.Log(letterSpace.Rt.position);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration / 2,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration / 2));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", rightPos,
-            "time", _nonoSplitDuration,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", rightPos,
-            "time", _nonoSplitDuration,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", leftPos,
-            "time", _nonoSplitDuration,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
         iTween.MoveTo(answerLetter.gameObject, iTween.Hash(
             "position", originalPos,
-            "time", _nonoSplitDuration / 2,
-            "easetype", "easeInCirc"));
+            "time", _nonoSplitDuration /2));
 
         yield return new WaitForSeconds(_nonoSplitDuration);
 
-
-        /**/
-
         // leave back all attempt at placing to true.
-        BlockInteraction = false;
 
         OnWordsClick();
     }

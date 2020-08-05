@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class Main : MonoBehaviour
 {
@@ -14,20 +16,9 @@ public class Main : MonoBehaviour
         return _main;
     }
 
-    public User LoggedUser;
-
-
-    [HideInInspector]
-    public DataService DataService;
-
-    [HideInInspector]
     public Dictionary<string, GameObject> scope;
-    [HideInInspector]
     public GameController GameController;
-    [HideInInspector]
     public LevelController LevelController;
-    [HideInInspector]
-    public LocaleController LocaleController;
 
     void Awake()
     {
@@ -46,28 +37,16 @@ public class Main : MonoBehaviour
         LevelController = scope["LevelView"].GetComponent<LevelController>();
         LevelController.gameObject.SetActive(false);
 
-        LocaleController = scope["LocaleView"].GetComponent<LocaleController>();
-        LocaleController.gameObject.SetActive(false);
-
         scope["Splash"].SetActive(true);
         StartCoroutine(
             ShowIntro(() =>
         {
             scope["Splash"].SetActive(false);
 
-            LocaleController.Init();
+            LevelController.Init();
         }));
 
         scope["LevelCompletedSplash"].SetActive(false);
-        
-        /*
-         * ---------------------------------------------------------------------
-         * * ---------------------------------------------------------------------
-         * * ---------------------------------------------------------------------
-         */
-
-        DataService = new DataService("Database.db");
-        CreateSession();
     }
 
     // callbacks
@@ -76,39 +55,22 @@ public class Main : MonoBehaviour
 
     IEnumerator ShowIntro(OnSplashFinish onSplashFinish)
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.1f);
 
         onSplashFinish();
     }
 
-    public void CreateSession()
+    public int GetPennyToss()
     {
-        LoggedUser = DataService.GetUser();
-        if (LoggedUser == null)
+        var randomNumber = Random.Range(0, 100);
+        return (randomNumber > 50) ? 1 : 0;
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.A))
         {
-            DataService.CreateDB();
-            var user = new User
-            {
-                Id = 1,
-                Name = "Player 1",
-                Language = "en_US",
-                Maps = 0
-            };
-            Debug.Log("This is a fresh install. Creating user..." + user);
-            DataService.CreateUser(user);
-            //
-            LoggedUser = DataService.GetUser();
+            //GameController.StartGame();
         }
-
-        if (LoggedUser.Maps == 0)
-        {
-            LoggedUser.Maps = 1;
-        }
-
-        scope["RomaniaMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
-        scope["EnglishMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
-        scope["PMaps"].GetComponent<Text>().text = LoggedUser.Maps.ToString();
-
-        Debug.Log("Logged in. " + LoggedUser);
     }
 }

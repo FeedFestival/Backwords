@@ -1,31 +1,66 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Assets.scripts.utils;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LevelController : MonoBehaviour
 {
-    public Dictionary<int, Level> Levels;
+    public Dictionary<int, Level> Levels = new Dictionary<int, Level>();
 
     public List<CButton> LevelButtons;
 
     public void Init()
     {
-        var levels = Main.Instance().DataService.GetLevels();
-        
-        Levels = new Dictionary<int, Level>();
-        foreach (Level level in levels)
+        Levels.Add(1, new Level
         {
-            Levels.Add(level.Id, level);
+            Id = 1,
+            Word = "ace"
+        });
+
+        Levels.Add(2, new Level
+        {
+            Id = 2,
+            Word = "Pasare"
+        });
+
+        Levels.Add(3, new Level
+        {
+            Id = 3,
+            Word = "cub"
+        });
+
+        Levels.Add(4, new Level
+        {
+            Id = 4,
+            Word = "felinar"
+        });
+
+        Levels.Add(5, new Level
+        {
+            Id = 5,
+            Word = "bujii"
+        });
+
+        Levels.Add(6, new Level
+        {
+            Id = 6,
+            Word = "desoxirribonucleic"
+        });
+
+        /*
+         * 
+         * 
+         * */
+
+        for (var i = 7; i < 35; i++)
+        {
+            Levels.Add(i, new Level { Id = i, Word = "test" });
         }
 
-        if (Levels != null && Levels.Count > 0)
-        {
-            gameObject.SetActive(true);
-            StartCoroutine(ShowLevels());
-        }
+        gameObject.SetActive(true);
+
+        StartCoroutine(ShowLevels());
     }
 
     IEnumerator ShowLevels()
@@ -36,11 +71,11 @@ public class LevelController : MonoBehaviour
         var gridLayoutGroup = Main.Instance().scope["LevelGrid"].GetComponent<GridLayoutGroup>();
 
         var width = rt.sizeDelta.x;
-
+        
         var cellSize = width / 6;
-
+        
         var paddingX = utils.GetPercent(cellSize, 20);
-
+        
         gridLayoutGroup.cellSize = new Vector2(cellSize - paddingX, cellSize - paddingX);
 
         var rows = (int)Levels.Count / 6;
@@ -58,11 +93,9 @@ public class LevelController : MonoBehaviour
                 letter.transform.SetParent(rt);
                 letter.transform.localScale = new Vector3(1, 1, 1);
 
-                var locked = i > Main.Instance().LoggedUser.Maps;
-
                 var but = letter.GetComponent<CButton>();
                 but.Init(i, i.ToString(),
-                    OnLevelSelected, locked:locked);
+                    OnLevelSelected);
 
                 LevelButtons.Add(but);
             }
@@ -87,10 +120,6 @@ public class LevelController : MonoBehaviour
         Main.Instance().scope["LevelGrid"].SetActive(false);
         gameObject.SetActive(true);
 
-        var user = Main.Instance().LoggedUser;
-        user.Maps++;
-        Main.Instance().DataService.UpdateUser(user);
-
         StartCoroutine(LevelCompletedSplash(index));
     }
 
@@ -104,4 +133,10 @@ public class LevelController : MonoBehaviour
         Main.Instance().GameController.Init();
         Main.Instance().GameController.StartGame(Levels[index + 1], OnLeveCompleted);
     }
+}
+
+public class Level
+{
+    public int Id;
+    public string Word;
 }
